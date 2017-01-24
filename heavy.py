@@ -6,23 +6,23 @@
 import os
 import subprocess
 import time
+import json
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Heavy(object):
     """Class that creates CPU heavy objects"""
-    def __init__(self, id=0, file_name='random.img', compress='True'):
+    def __init__(self, file_name='random.img', compress='False'):
 
         self.file_name = file_name
-        self.id = id
         self.compress = compress
-        self.basedir = basedir
         self.time = 0
+        self.data = []
 
     def __del__(self):
-
-        #file_path = ("%s/%s" % (self.basedir, self.file_name))
+        
         print "Operation took: %s" % self.time
+
         if os.path.exists(self.file_name):
             try:
                 if (self.compress == "True"):
@@ -35,7 +35,7 @@ class Heavy(object):
         else:
             print("Sorry, I can not remove %s file." % self.file_name)
 
-        return 200
+        return self.data, 200
 
     def get_time(self):
 
@@ -45,8 +45,9 @@ class Heavy(object):
         start_time = time.time() 
         try:
             print ("Creating: " + self.file_name)
-            #subprocess.call(["dd", "if=/dev/urandom", "of="+self.file_name, "count=64", "bs=1M"])
-            file = open(self.file_name, 'w+')
+            self.data.append({'file name': self.file_name})
+            subprocess.call(["dd", "if=/dev/urandom", "of="+self.file_name, "count=64", "bs=1M"])
+            #file = open(self.file_name, 'w+')
         except Exception as e:
             raise e
             return "Bad request", 400
@@ -55,20 +56,23 @@ class Heavy(object):
             self.compress_file()
 
         self.time = time.time() - start_time
+        self.data.append({'time': self.time})
 
-        content = {'please move along': 'nothing to see here'}
-        return content, 200
+        return self.data, 200
 
 
     def compress_file(self):
 
-        try:
-            subprocess.call(["tar", "-czvf", self.file_name+".tar.gz", self.file_name])
+        try:   
+            compressed_file = (self.file_name + ".tar.gz")
+            self.data.append({'compressed file': self.file_name+".tar.gz"})
+            subprocess.call(["tar", "czvf", self.file_name + ".tar.gz", self.file_name])
+            
         except Exception as e:
             raise e
             return 400
 
         return 200
 
-if __name__ == '__main__':
-    heavy_operation = Heavy()
+#if __name__ == '__main__':
+#    heavy_operation = Heavy() #testing

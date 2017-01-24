@@ -1,34 +1,42 @@
-from flask import Flask, render_template, jsonify
+# Notes:
+# Author: Marcin Taracha
+# Version: 1.0
+
+from flask import Flask, render_template, jsonify, abort, request, make_response, url_for
 from heavy import * 
 
 # Import SQLAlchemy
 #from flask.ext.sqlalchemy import SQLAlchemy
 
-# Define the WSGI application object
 app = Flask(__name__)
 
-# Configurations
-app.config.from_object('config')
-
-
-@app.route("/")
+@app.route("/v1/api")
 def welcome():
 
-	return render_template('index.html', message="Welcome to Heavy API")
+	return make_response(jsonify({'message': 'Welcome to Heavy API'}), 200) 
 
-@app.route("/create/<file>")
+@app.route("/v1/api/create/<file>")
 def file_create(file):
+	
 	heavy = Heavy(file_name=file)
-	return render_template('file.html', message=heavy.create_file())
+	
+	return make_response(jsonify({'message': heavy.create_file()}), 200) 
 
-@app.route("/compress/<file>")
+@app.route("/v1/api/compress/<file>")
 def file_compress(file):
-	heavy = Heavy(file_name=file)
-	return render_template('file.html', message=heavy.compress_file())
+	
+	heavy = Heavy(file_name=file, compress='True')
 
-@app.route("/show/operations")
+	return make_response(jsonify({'message': heavy.create_file()}), 200) 
+
+@app.route("/v1/api/show/operations")
 def show_operations():
 	return 69
 
 if __name__ == '__main__':
-    app.run(debug=True)
+
+    app.run(
+    	debug=True,
+        host="0.0.0.0",
+        port=int("5000")
+    )
