@@ -18,11 +18,16 @@ class Heavy(object):
         self.compress = compress
         self.basedir = basedir
         self.time = 0
+        self.data = {}
+
+
 
     def __del__(self):
 
-        #file_path = ("%s/%s" % (self.basedir, self.file_name))
+        self.data['time'] = self.time
+        
         print "Operation took: %s" % self.time
+
         if os.path.exists(self.file_name):
             try:
                 if (self.compress == "True"):
@@ -35,7 +40,7 @@ class Heavy(object):
         else:
             print("Sorry, I can not remove %s file." % self.file_name)
 
-        return 200
+        return self.data, 200
 
     def get_time(self):
 
@@ -55,9 +60,10 @@ class Heavy(object):
             self.compress_file()
 
         self.time = time.time() - start_time
+        self.data['time'] = self.time
 
-        content = {'please move along': 'nothing to see here'}
-        return content, 200
+        #content = {'please move along': 'nothing to see here'}
+        return self.data, 200
 
 
     def compress_file(self):
