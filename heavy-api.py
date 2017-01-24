@@ -25,13 +25,18 @@ def file_create(file):
 @app.route("/v1/api/compress/<file>")
 def file_compress(file):
 	
-	heavy = Heavy(file_name=file)
+	heavy = Heavy(file_name=file, compress='True')
 
-	return make_response(jsonify({'message': heavy.compress_file()}), 200) 
+	return make_response(jsonify({'message': heavy.create_file()}), 200) 
 
 @app.route("/v1/api/show/operations")
 def show_operations():
 	return 69
 
 if __name__ == '__main__':
-    app.run(debug=True)
+
+    app.run(
+    	debug=True,
+        host="0.0.0.0",
+        port=int("5000")
+    )
